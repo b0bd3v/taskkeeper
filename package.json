@@ -17,13 +17,7 @@
     "onCommand:taskkeeper.createTask",
     "onCommand:taskkeeper.switchTask",
     "onCommand:taskkeeper.refreshTasks",
-    "onCommand:taskkeeper.activateTaskConfirm",
-    "onCommand:taskkeeper.renameTask",
-    "onCommand:taskkeeper.deleteTask",
-    "onCommand:taskkeeper.completeTask"
-  ],
-  "extensionDependencies": [
-    "alefragnani.Bookmarks"
+    "onCommand:taskkeeper.selectTaskFromTree"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -47,28 +41,9 @@
         "icon": "$(refresh)"
       },
       {
-        "command": "taskkeeper.activateTaskConfirm",
-        "title": "Activate Task",
-        "category": "TaskKeeper",
-        "icon": "$(play)"
-      },
-      {
-        "command": "taskkeeper.renameTask",
-        "title": "Rename Task",
-        "category": "TaskKeeper",
-        "icon": "$(edit)"
-      },
-      {
-        "command": "taskkeeper.deleteTask",
-        "title": "Delete Task",
-        "category": "TaskKeeper",
-        "icon": "$(trash)"
-      },
-      {
-        "command": "taskkeeper.completeTask",
-        "title": "Mark Task as Completed",
-        "category": "TaskKeeper",
-        "icon": "$(check-all)"
+        "command": "taskkeeper.selectTaskFromTree",
+        "title": "Select Task",
+        "category": "TaskKeeper"
       }
     ],
     "viewsContainers": {
@@ -106,48 +81,9 @@
           "group": "navigation@3"
         }
       ],
-      "view/item/context": [
-        {
-          "command": "taskkeeper.activateTaskConfirm",
-          "when": "view == taskkeeper.tasks && viewItem =~ /^taskkeeper\\.task($|\\.archived$)/",
-          "group": "inline@1"
-        },
-        {
-          "command": "taskkeeper.activateTaskConfirm",
-          "when": "view == taskkeeper.tasks && viewItem =~ /^taskkeeper\\.task($|\\.archived$)/",
-          "group": "1_activate@1"
-        },
-        {
-          "command": "taskkeeper.renameTask",
-          "when": "view == taskkeeper.tasks && viewItem =~ /^taskkeeper\\.task/",
-          "group": "2_modify@1"
-        },
-        {
-          "command": "taskkeeper.completeTask",
-          "when": "view == taskkeeper.tasks && viewItem =~ /^taskkeeper\\.task($|\\.active$)/",
-          "group": "2_modify@2"
-        },
-        {
-          "command": "taskkeeper.deleteTask",
-          "when": "view == taskkeeper.tasks && viewItem =~ /^taskkeeper\\.task/",
-          "group": "3_danger@1"
-        }
-      ],
       "commandPalette": [
         {
-          "command": "taskkeeper.activateTaskConfirm",
-          "when": "false"
-        },
-        {
-          "command": "taskkeeper.renameTask",
-          "when": "false"
-        },
-        {
-          "command": "taskkeeper.deleteTask",
-          "when": "false"
-        },
-        {
-          "command": "taskkeeper.completeTask",
+          "command": "taskkeeper.selectTaskFromTree",
           "when": "false"
         }
       ]
