@@ -8,21 +8,35 @@ interface TaskPickItem extends vscode.QuickPickItem {
 
 export async function showTaskSelection(
   tasks: TaskSummary[],
+  options?: { includeGeneral?: boolean; generalDescription?: string },
 ): Promise<string | undefined> {
-  if (tasks.length === 0) {
+  const items: TaskPickItem[] = [];
+
+  if (options?.includeGeneral) {
+    items.push({
+      label: '$(home) Geral',
+      description: options.generalDescription ?? 'escopo base',
+      detail: 'Alterações que não pertencem a nenhuma task',
+      taskId: '__general__',
+    });
+  }
+
+  items.push(
+    ...tasks.map((task) => ({
+      label: task.isActive ? `$(check) ${task.title}` : task.title,
+      description: formatRelativeTime(task.lastActiveAt),
+      detail: `${task.breakpointCount} breakpoints · ${task.bookmarkCount} bookmarks`,
+      taskId: task.id,
+      picked: task.isActive,
+    })),
+  );
+
+  if (items.length === 0) {
     void vscode.window.showInformationMessage(
       'TaskKeeper: nenhuma task cadastrada. Use "Create Task" para começar.',
     );
     return undefined;
   }
-
-  const items: TaskPickItem[] = tasks.map((task) => ({
-    label: task.isActive ? `$(check) ${task.title}` : task.title,
-    description: formatRelativeTime(task.updatedAt),
-    detail: `${task.breakpointCount} breakpoints · ${task.bookmarkCount} bookmarks`,
-    taskId: task.id,
-    picked: task.isActive,
-  }));
 
   const selected = await vscode.window.showQuickPick(items, {
     title: 'TaskKeeper — Trocar task',

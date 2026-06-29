@@ -1,37 +1,64 @@
 import * as vscode from 'vscode';
 
-import type { TaskStore } from '../services/taskStore';
-import type { TaskTreeProvider } from '../views/taskTreeProvider';
-import type { TaskStatusBar } from '../ui/statusBar';
 import { showCreateTaskForm } from '../ui/createTaskForm';
-
-interface CreateTaskDeps {
-  store: TaskStore;
-  treeProvider: TaskTreeProvider;
-  statusBar: TaskStatusBar;
-}
+import { promptLinkLooseContext } from '../ui/linkContextPrompt';
+import { refreshUi, type CommandDeps } from './types';
 
 export function registerCreateTaskCommand(
   context: vscode.ExtensionContext,
-  deps: CreateTaskDeps,
+  deps: CommandDeps,
 ): void {
   const command = vscode.commands.registerCommand(
     'taskkeeper.createTask',
     async () => {
-      const form = await showCreateTaskForm();
-      if (!form) {
+      const title = await showCreateTaskForm();
+      if (!title) {
         return;
       }
 
-      const task = deps.store.createTask(form.title, form.createNewContext);
+      const hasActive = deps.store.getActiveTask() !== undefined;
 
-      deps.treeProvider.refresh();
-      deps.statusBar.refresh();
+      if (hasActive) {
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'TaskKeeper: salvando contexto da task ativa...',
+          },
+          () => deps.switcher.shelveActiveAndClear(),
+        );
 
-      const contextLabel = form.createNewContext
-        ? 'com contexto novo (simulado)'
-        : 'sem trocar contexto salvo';
+        const task = await deps.store.createTask(title);
+        refreshUi(deps);
+        void vscode.window.showInformationMessage(
+          `TaskKeeper: task "${task.title}" criada com contexto novo (estado anterior salvo).`,
+        );
+        return;
+      }
 
+      let linkLoose = false;
+      if (await deps.switcher.hasLooseContext()) {
+        const choice = await promptLinkLooseContext(title, 'create');
+        if (choice === undefined) {
+          return;
+        }
+        linkLoose = choice;
+      }
+
+      if (!linkLoose) {
+        await deps.switcher.shelveGeneralAndClear();
+      }
+
+      const task = await deps.store.createTask(title);
+
+      if (linkLoose) {
+        await deps.switcher.captureContext(task);
+      }
+
+      refreshUi(deps);
+
+      const contextLabel = linkLoose
+        ? 'com o contexto atual vinculado'
+        : 'com contexto novo';
       void vscode.window.showInformationMessage(
         `TaskKeeper: task "${task.title}" criada ${contextLabel}.`,
       );
