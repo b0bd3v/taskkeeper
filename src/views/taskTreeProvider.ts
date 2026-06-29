@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 
 import type { TaskSummary } from '../models/taskContext';
+import type { ChangeStatCache } from '../services/changeStatCache';
+import type { GitService } from '../services/gitService';
 import type { TaskStore } from '../services/taskStore';
 
 type TaskTreeNode = TaskItem | MessageItem;
@@ -41,7 +43,14 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TaskTreeNode> {
 
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  constructor(private readonly store: TaskStore) {}
+  constructor(
+    private readonly store: TaskStore,
+    private readonly changeStatCache: ChangeStatCache,
+    private readonly git: GitService,
+    private readonly workspaceRoot: string,
+  ) {}
+
+  attachView(_view: vscode.TreeView<TaskTreeNode>): void {}
 
   refresh(): void {
     this._onDidChangeTreeData.fire(undefined);

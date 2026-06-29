@@ -5,6 +5,7 @@ import { registerSwitchTaskCommands } from './commands/switchTask';
 import { registerTaskActionCommands } from './commands/taskActions';
 import type { CommandDeps } from './commands/types';
 import { BookmarkService } from './services/bookmarkService';
+import { ChangeStatCache } from './services/changeStatCache';
 import { BreakpointService } from './services/breakpointService';
 import { ContextSwitcher } from './services/contextSwitcher';
 import { EditorService } from './services/editorService';
@@ -39,7 +40,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     git,
   });
 
-  const treeProvider = new TaskTreeProvider(store, editor, workspaceRoot);
+  const changeStatCache = new ChangeStatCache(git, store);
+  const treeProvider = new TaskTreeProvider(store, changeStatCache, git, workspaceRoot);
   const statusBar = new TaskStatusBar(store);
 
   const treeView = vscode.window.createTreeView('taskkeeper.tasks', {
