@@ -8,10 +8,9 @@ export class TaskStatusBar {
   constructor(private readonly store: TaskStore) {
     this.item = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
-      100,
+      Number.MAX_SAFE_INTEGER,
     );
     this.item.command = 'taskkeeper.switchTask';
-    this.item.tooltip = 'TaskKeeper: trocar task ativa';
   }
 
   show(): void {
@@ -23,14 +22,18 @@ export class TaskStatusBar {
     const activeTask = this.store.getActiveTask();
 
     if (!activeTask) {
-      this.item.text = '$(checklist) TaskKeeper: nenhuma task';
+      this.item.text = '$(home) Geral';
+      this.item.tooltip = 'TaskKeeper: escopo Geral ativo — clique para trocar';
       this.item.backgroundColor = undefined;
       return;
     }
 
-    this.item.text = `$(checklist) Task: ${activeTask.title}`;
+    this.item.text = `$(target) ${activeTask.title}`;
+    this.item.tooltip = new vscode.MarkdownString(
+      `**Task ativa:** ${activeTask.title}\n\nClique para trocar de task.`,
+    );
     this.item.backgroundColor = new vscode.ThemeColor(
-      'statusBarItem.prominentBackground',
+      'statusBarItem.warningBackground',
     );
   }
 

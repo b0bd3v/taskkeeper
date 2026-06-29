@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 
-import { totalFileCount } from '../models/changeStat';
 import { GENERAL_PATCH_ID } from '../services/taskStore';
+import { EMPTY_CHANGE_STAT, type ChangeStat } from '../models/changeStat';
+import { scopeActivatedMessage } from '../utils/activationMessages';
 import { formatScopeDescription } from '../utils/changeStatFormat';
 import { promptLinkLooseContext } from '../ui/linkContextPrompt';
 import { showTaskSelection } from '../ui/taskQuickPick';
@@ -92,7 +93,7 @@ async function runActivateGeneral(deps: CommandDeps): Promise<void> {
     return;
   }
 
-  await showActivatedToast(deps, 'Geral ativado');
+  await showScopeActivatedToast(deps, 'Geral');
 }
 
 async function performActivation(
@@ -145,24 +146,20 @@ async function performActivation(
     return;
   }
 
-  await showActivatedToast(deps, `task "${title}" ativada`);
+  await showScopeActivatedToast(deps, title);
 }
 
-async function showActivatedToast(
+async function showScopeActivatedToast(
   deps: CommandDeps,
   scopeLabel: string,
 ): Promise<void> {
-  let message = `TaskKeeper: ${scopeLabel}.`;
+  const stat: ChangeStat = (await deps.git.canShelve())
+    ? await deps.git.liveChangeStat()
+    : EMPTY_CHANGE_STAT;
 
-  if (await deps.git.canShelve()) {
-    const stat = await deps.git.liveChangeStat();
-    const count = totalFileCount(stat);
-    if (count > 0) {
-      message = `TaskKeeper: ${scopeLabel} (${count} alteração${count === 1 ? '' : 'ões'} restauradas).`;
-    }
-  }
-
-  void vscode.window.showInformationMessage(message);
+  void vscode.window.showInformationMessage(
+    scopeActivatedMessage(scopeLabel, stat),
+  );
 }
 
 async function getGeneralDescription(deps: CommandDeps): Promise<string> {

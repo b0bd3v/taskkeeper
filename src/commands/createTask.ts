@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
 
+import { EMPTY_CHANGE_STAT, type ChangeStat } from '../models/changeStat';
+import { GENERAL_PATCH_ID } from '../services/taskStore';
 import { showCreateTaskForm } from '../ui/createTaskForm';
 import { promptLinkLooseContext } from '../ui/linkContextPrompt';
+import { scopeSavedMessage } from '../utils/activationMessages';
 import { refreshUi, type CommandDeps } from './types';
 
 export function registerCreateTaskCommand(
@@ -16,9 +19,9 @@ export function registerCreateTaskCommand(
         return;
       }
 
-      const hasActive = deps.store.getActiveTask() !== undefined;
+      const activeTask = deps.store.getActiveTask();
 
-      if (hasActive) {
+      if (activeTask) {
         await vscode.window.withProgress(
           {
             location: vscode.ProgressLocation.Notification,
@@ -27,10 +30,14 @@ export function registerCreateTaskCommand(
           () => deps.switcher.shelveActiveAndClear(),
         );
 
+        const shelvedStat = await shelvedScopeStat(deps, activeTask.id);
         const task = await deps.store.createTask(title);
         refreshUi(deps);
         void vscode.window.showInformationMessage(
-          `TaskKeeper: task "${task.title}" criada com contexto novo (estado anterior salvo).`,
+          scopeSavedMessage(activeTask.title, shelvedStat),
+        );
+        void vscode.window.showInformationMessage(
+          `TaskKeeper: task "${task.title}" criada com contexto novo.`,
         );
         return;
       }
@@ -44,8 +51,10 @@ export function registerCreateTaskCommand(
         linkLoose = choice;
       }
 
+      let shelvedGeneralStat = EMPTY_CHANGE_STAT;
       if (!linkLoose) {
         await deps.switcher.shelveGeneralAndClear();
+        shelvedGeneralStat = await shelvedScopeStat(deps, GENERAL_PATCH_ID);
       }
 
       const task = await deps.store.createTask(title);
@@ -56,6 +65,11 @@ export function registerCreateTaskCommand(
 
       refreshUi(deps);
 
+      if (!linkLoose) {
+        void vscode.window.showInformationMessage(
+          scopeSavedMessage('Geral', shelvedGeneralStat),
+        );
+      }
       const contextLabel = linkLoose
         ? 'com o contexto atual vinculado'
         : 'com contexto novo';
@@ -66,4 +80,20 @@ export function registerCreateTaskCommand(
   );
 
   context.subscriptions.push(command);
+}
+
+async function shelvedScopeStat(
+  deps: CommandDeps,
+  scopeId: string,
+): Promise<ChangeStat> {
+  if (!(await deps.git.canShelve())) {
+    return EMPTY_CHANGE_STAT;
+  }
+
+  const patchFile = await deps.store.patchFile(scopeId);
+  if (!patchFile) {
+    return EMPTY_CHANGE_STAT;
+  }
+
+  return deps.git.patchChangeStat(patchFile);
 }
