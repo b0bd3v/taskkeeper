@@ -1,0 +1,52 @@
+{
+  "name": "taskkeeper",
+  "displayName": "TaskKeeper",
+  "description": "Task context switching for support developers — patches, breakpoints, and bookmarks per ticket.",
+  "version": "0.0.1",
+  "publisher": "utils",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:taskkeeper.helloWorld",
+    "onCommand:taskkeeper.createTask",
+    "onCommand:taskkeeper.switchTask"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "taskkeeper.helloWorld",
+        "title": "TaskKeeper: Hello World",
+        "category": "TaskKeeper"
+      },
+      {
+        "command": "taskkeeper.createTask",
+        "title": "TaskKeeper: Create Task",
+        "category": "TaskKeeper"
+      },
+      {
+        "command": "taskkeeper.switchTask",
+        "title": "TaskKeeper: Switch Task",
+        "category": "TaskKeeper"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.5.0"
+  }
+}
