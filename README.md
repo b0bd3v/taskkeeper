@@ -17,4 +17,14 @@ Teste: `Cmd+Shift+P` → `TaskKeeper: Hello World`
 
 ## Status
 
-v0.0.1 — scaffold hello world. Comandos Create Task e Switch Task documentados na spec, implementação pendente.
+v0.0.2 — interface UI (formulário, lista, seleção). Persistência, patches, breakpoints e bookmarks ainda não implementados.
+
+### Comandos
+
+| Comando | Atalho visual |
+|---------|---------------|
+| `TaskKeeper: Create Task` | Ícone `+` na sidebar |
+| `TaskKeeper: Switch Task` | Ícone swap na sidebar / status bar |
+| `TaskKeeper: Refresh` | Ícone refresh na sidebar |
+
+Sidebar: ícone **TaskKeeper** (`checklist`) na activity bar.

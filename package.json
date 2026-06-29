@@ -13,29 +13,81 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:taskkeeper.helloWorld",
+    "onView:taskkeeper.tasks",
     "onCommand:taskkeeper.createTask",
-    "onCommand:taskkeeper.switchTask"
+    "onCommand:taskkeeper.switchTask",
+    "onCommand:taskkeeper.refreshTasks",
+    "onCommand:taskkeeper.selectTaskFromTree"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "taskkeeper.helloWorld",
-        "title": "TaskKeeper: Hello World",
-        "category": "TaskKeeper"
-      },
-      {
         "command": "taskkeeper.createTask",
-        "title": "TaskKeeper: Create Task",
-        "category": "TaskKeeper"
+        "title": "Create Task",
+        "category": "TaskKeeper",
+        "icon": "$(add)"
       },
       {
         "command": "taskkeeper.switchTask",
-        "title": "TaskKeeper: Switch Task",
+        "title": "Switch Task",
+        "category": "TaskKeeper",
+        "icon": "$(arrow-swap)"
+      },
+      {
+        "command": "taskkeeper.refreshTasks",
+        "title": "Refresh",
+        "category": "TaskKeeper",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "taskkeeper.selectTaskFromTree",
+        "title": "Select Task",
         "category": "TaskKeeper"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "taskkeeper",
+          "title": "TaskKeeper",
+          "icon": "$(checklist)"
+        }
+      ]
+    },
+    "views": {
+      "taskkeeper": [
+        {
+          "id": "taskkeeper.tasks",
+          "name": "Tasks"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "taskkeeper.createTask",
+          "when": "view == taskkeeper.tasks",
+          "group": "navigation@1"
+        },
+        {
+          "command": "taskkeeper.switchTask",
+          "when": "view == taskkeeper.tasks",
+          "group": "navigation@2"
+        },
+        {
+          "command": "taskkeeper.refreshTasks",
+          "when": "view == taskkeeper.tasks",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "taskkeeper.selectTaskFromTree",
+          "when": "false"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

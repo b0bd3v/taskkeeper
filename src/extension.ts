@@ -1,16 +1,27 @@
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext): void {
-  const helloWorld = vscode.commands.registerCommand(
-    'taskkeeper.helloWorld',
-    () => {
-      void vscode.window.showInformationMessage(
-        'TaskKeeper: Hello World — extensão pronta para desenvolvimento.',
-      );
-    },
-  );
+import { registerCreateTaskCommand } from './commands/createTask';
+import { registerSwitchTaskCommand } from './commands/switchTask';
+import { TaskStore } from './services/taskStore';
+import { TaskStatusBar } from './ui/statusBar';
+import { TaskTreeProvider } from './views/taskTreeProvider';
 
-  context.subscriptions.push(helloWorld);
+export function activate(context: vscode.ExtensionContext): void {
+  const store = new TaskStore();
+  const treeProvider = new TaskTreeProvider(store);
+  const statusBar = new TaskStatusBar(store);
+
+  const treeView = vscode.window.createTreeView('taskkeeper.tasks', {
+    treeDataProvider: treeProvider,
+    showCollapseAll: false,
+  });
+
+  registerCreateTaskCommand(context, { store, treeProvider, statusBar });
+  registerSwitchTaskCommand(context, { store, treeProvider, statusBar });
+
+  statusBar.show();
+
+  context.subscriptions.push(treeView, statusBar);
 }
 
 export function deactivate(): void {}
