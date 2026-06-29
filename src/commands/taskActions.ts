@@ -100,7 +100,7 @@ export function registerTaskActionCommands(
       }
 
       await confirmDeleteOrArchive(deps, task.id, task.title, {
-        skipArchiveOption: false,
+        skipArchiveOption: true,
       });
     },
   );
@@ -112,19 +112,25 @@ async function confirmDeleteOrArchive(
   deps: CommandDeps,
   taskId: string,
   title: string,
-  _options: { skipArchiveOption?: boolean } = {},
+  options: { skipArchiveOption?: boolean } = {},
 ): Promise<void> {
   const isActive = deps.store.getActiveTaskId() === taskId;
   const detail = isActive
     ? 'Esta é a task ativa. O patch salvo será removido ao excluir.'
     : 'O patch salvo desta task será removido ao excluir.';
 
-  const choice = await vscode.window.showWarningMessage(
-    `Excluir a task "${title}"?`,
-    { modal: true, detail },
-    'Excluir',
-    'Arquivar',
-  );
+  const choice = options.skipArchiveOption
+    ? await vscode.window.showWarningMessage(
+        `Excluir a task "${title}"?`,
+        { modal: true, detail },
+        'Excluir',
+      )
+    : await vscode.window.showWarningMessage(
+        `Excluir a task "${title}"?`,
+        { modal: true, detail },
+        'Excluir',
+        'Arquivar',
+      );
 
   if (choice === 'Arquivar') {
     await deps.store.setStatus(taskId, 'archived');

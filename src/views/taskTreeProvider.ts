@@ -203,18 +203,16 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<TaskTreeNode> {
       new GeneralItem(isGeneralActive, generalStat, gitAvailable),
     ];
 
-    const summaries = this.store
-      .listSummaries()
-      .filter((s) => !s.isArchived);
+    const summaries = this.store.listSummaries();
+    const active = summaries.filter((s) => !s.isArchived);
+    const archived = summaries.filter((s) => s.isArchived);
 
-    for (const summary of summaries) {
+    for (const summary of active) {
       const stat = gitAvailable
         ? await this.changeStatCache.getForTask(summary.id, summary.isActive)
         : EMPTY_CHANGE_STAT;
       nodes.push(new TaskItem(summary, stat, gitAvailable));
     }
-
-    const archived = this.store.listSummaries().filter((s) => s.isArchived);
     if (archived.length > 0) {
       nodes.push(new ArchivedFolderItem(archived.length));
     }
@@ -269,7 +267,7 @@ function buildTooltip(summary: TaskSummary): vscode.MarkdownString {
   const markdown = new vscode.MarkdownString();
   markdown.appendMarkdown(`**${summary.title}**\n\n`);
   markdown.appendMarkdown(
-    `- Breakpoints: ${summary.breakpointCount}\n- Bookmarks: ${summary.bookmarkCount}\n- Atualizada: ${new Date(summary.updatedAt).toLocaleString()}`,
+    `- Breakpoints: ${summary.breakpointCount}\n- Bookmarks: ${summary.bookmarkCount}\n- Última vez ativa: ${new Date(summary.lastActiveAt).toLocaleString()}`,
   );
   return markdown;
 }

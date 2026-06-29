@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import type { TaskSummary } from '../models/taskContext';
+import { GENERAL_PATCH_ID } from '../services/taskStore';
 
 interface TaskPickItem extends vscode.QuickPickItem {
   taskId: string;
@@ -17,7 +18,7 @@ export async function showTaskSelection(
       label: '$(home) Geral',
       description: options.generalDescription ?? 'escopo base',
       detail: 'Alterações que não pertencem a nenhuma task',
-      taskId: '__general__',
+      taskId: GENERAL_PATCH_ID,
     });
   }
 

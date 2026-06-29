@@ -140,11 +140,6 @@ export class ContextSwitcher {
     await this.clearEnvironment(untracked);
   }
 
-  /** @deprecated Use {@link shelveGeneralAndClear} — alias for backward compatibility. */
-  async stashLooseAndClear(): Promise<void> {
-    return this.shelveGeneralAndClear();
-  }
-
   async activateGeneral(): Promise<ActivateResult> {
     const active = this.deps.store.getActiveTask();
 
