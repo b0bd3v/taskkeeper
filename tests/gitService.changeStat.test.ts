@@ -44,6 +44,24 @@ describe('GitService change stats', () => {
       assert.equal(stat.modified[0]?.path, 'README.md');
     });
   });
+
+  it('applyPatchPaths restores a single file from patch', async () => {
+    await withTempGitRepo(async (dir) => {
+      await fsp.writeFile(path.join(dir, 'new.ts'), 'export const x = 1;\n', 'utf8');
+      const git = new GitService(dir);
+      const { patch } = await git.captureChanges();
+      const patchFile = path.join(dir, 'test.patch');
+      await fsp.writeFile(patchFile, patch, 'utf8');
+      await git.revertWorkingTree(['new.ts']);
+
+      assert.equal(await fsp.access(path.join(dir, 'new.ts')).then(() => true).catch(() => false), false);
+
+      const ok = await git.applyPatchPaths(patchFile, ['new.ts']);
+      assert.equal(ok, true);
+      const content = await fsp.readFile(path.join(dir, 'new.ts'), 'utf8');
+      assert.equal(content, 'export const x = 1;\n');
+    });
+  });
 });
 
 async function execGit(cwd: string, args: string[]): Promise<void> {

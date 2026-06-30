@@ -23,6 +23,41 @@ describe('changeStatFormat', () => {
     assert.equal(formatScopeDescription(sample), '~2 +1 −1  ⬆22 ⬇10');
   });
 
+  it('formatScopeDescription includes bookmark and breakpoint counts', () => {
+    assert.equal(
+      formatScopeDescription(sample, { bookmarkCount: 1, breakpointCount: 2 }),
+      '~2 +1 −1  ⬆22 ⬇10  ♡1 ●2',
+    );
+  });
+
+  it('formatScopeDescription handles empty stat with debug counts', () => {
+    const empty: ChangeStat = {
+      modified: [],
+      added: [],
+      deleted: [],
+      insertions: 0,
+      deletions: 0,
+    };
+    assert.equal(
+      formatScopeDescription(empty, { bookmarkCount: 2, breakpointCount: 1 }),
+      'sem alterações  ♡2 ●1',
+    );
+  });
+
+  it('formatScopeDescription handles no-git with debug counts', () => {
+    const empty: ChangeStat = {
+      modified: [],
+      added: [],
+      deleted: [],
+      insertions: 0,
+      deletions: 0,
+    };
+    assert.equal(
+      formatScopeDescription(empty, { bookmarkCount: 1, breakpointCount: 0 }, false),
+      'alterações indisponíveis (sem git)  ♡1',
+    );
+  });
+
   it('formatScopeDescription handles empty stat', () => {
     const empty: ChangeStat = {
       modified: [],
@@ -45,6 +80,18 @@ describe('changeStatFormat', () => {
     assert.equal(
       formatFileDescription(sample.deleted[0]!),
       'src  ⬇6',
+    );
+  });
+
+  it('formatFileDescription handles root-level files', () => {
+    assert.equal(
+      formatFileDescription({
+        path: 'README.md',
+        status: 'modified',
+        insertions: 3,
+        deletions: 1,
+      }),
+      '⬆3 ⬇1',
     );
   });
 });
