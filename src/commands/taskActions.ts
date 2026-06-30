@@ -35,7 +35,7 @@ export function registerTaskActionCommands(
       }
 
       await deps.store.renameTask(task.id, trimmed);
-      refreshUi(deps);
+      refreshUi(deps, 'scopes');
       void vscode.window.showInformationMessage(
         `TaskKeeper: task renomeada para "${trimmed}".`,
       );
@@ -92,7 +92,7 @@ export function registerTaskActionCommands(
 
       if (choice.action === 'archive') {
         await deps.store.setStatus(task.id, 'archived');
-        refreshUi(deps);
+        refreshUi(deps, 'full');
         void vscode.window.showInformationMessage(
           `TaskKeeper: task "${task.title}" concluída e arquivada.`,
         );
@@ -134,7 +134,7 @@ async function confirmDeleteOrArchive(
 
   if (choice === 'Arquivar') {
     await deps.store.setStatus(taskId, 'archived');
-    refreshUi(deps);
+    refreshUi(deps, 'full');
     void vscode.window.showInformationMessage(
       `TaskKeeper: task "${title}" arquivada.`,
     );
@@ -143,7 +143,7 @@ async function confirmDeleteOrArchive(
 
   if (choice === 'Excluir') {
     await deps.switcher.deleteTask(taskId);
-    refreshUi(deps);
+    refreshUi(deps, 'full');
     void vscode.window.showInformationMessage(
       `TaskKeeper: task "${title}" excluída.`,
     );

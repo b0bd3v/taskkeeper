@@ -35,7 +35,7 @@ export async function promptLinkLooseContext(
     {
       title: 'TaskKeeper — Alterações do Geral',
       placeHolder:
-        'Há alterações no Geral (arquivos, breakpoints, bookmarks). O que fazer?',
+        'Há alterações git no Geral. O que fazer?',
       ignoreFocusOut: true,
     },
   );

@@ -114,6 +114,31 @@ export class GitService {
     }
   }
 
+  /**
+   * Reaplica apenas os paths indicados de um patch salvo. Útil para trazer um
+   * arquivo shelvado de outro escopo para a working tree atual.
+   */
+  async applyPatchPaths(patchFilePath: string, paths: string[]): Promise<boolean> {
+    if (paths.length === 0) {
+      return false;
+    }
+
+    try {
+      const includeArgs = paths.flatMap((p) => ['--include', p]);
+      await this.run([
+        'apply',
+        '--3way',
+        '--whitespace=nowarn',
+        ...includeArgs,
+        '--',
+        patchFilePath,
+      ]);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async liveChangeStat(): Promise<ChangeStat> {
     if (!(await this.canShelve())) {
       return EMPTY_CHANGE_STAT;

@@ -8,6 +8,7 @@ import type {
   TaskStatus,
   TaskSummary,
 } from '../models/taskContext';
+import { compareByDayDesc } from '../utils/dayTime';
 
 interface StoreConfig {
   version: number;
@@ -80,7 +81,15 @@ export class TaskStore {
   listSummaries(): TaskSummary[] {
     return [...this.tasks.values()]
       .map((task) => this.toSummary(task))
-      .sort((a, b) => b.lastActiveAt - a.lastActiveAt);
+      .sort((a, b) => {
+        const byDay = compareByDayDesc(a.lastActiveAt, b.lastActiveAt);
+        if (byDay !== 0) {
+          return byDay;
+        }
+        const taskA = this.tasks.get(a.id);
+        const taskB = this.tasks.get(b.id);
+        return (taskB?.createdAt ?? 0) - (taskA?.createdAt ?? 0);
+      });
   }
 
   getActiveTaskId(): string | undefined {
@@ -132,9 +141,7 @@ export class TaskStore {
     }
 
     this.activeTaskId = id;
-    const now = Date.now();
-    task.lastActiveAt = now;
-    task.updatedAt = now;
+    task.updatedAt = Date.now();
     await this.writeTask(task);
     await this.writeConfig();
     return task;

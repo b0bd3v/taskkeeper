@@ -1,3 +1,4 @@
+import { totalFileCount } from '../models/changeStat';
 import type {
   OpenFileSnapshot,
   SerializedBreakpoint,
@@ -64,8 +65,22 @@ export class ContextSwitcher {
       untracked = changes.untracked;
     }
 
+    task.lastActiveAt = Date.now();
     await store.saveTask(task);
     return untracked;
+  }
+
+  /**
+   * Indica se o Geral tem alterações git visíveis na árvore (working tree).
+   * Usado para decidir se o prompt "vincular ao destino?" deve aparecer.
+   */
+  async hasLooseGitChanges(): Promise<boolean> {
+    const { git } = this.deps;
+    if (!(await git.canShelve())) {
+      return false;
+    }
+    const stat = await git.liveChangeStat();
+    return totalFileCount(stat) > 0;
   }
 
   /**

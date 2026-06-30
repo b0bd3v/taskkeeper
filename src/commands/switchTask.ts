@@ -41,6 +41,11 @@ export function registerSwitchTaskCommands(
         return;
       }
 
+      if (taskId === GENERAL_PATCH_ID) {
+        await runActivateGeneral(deps);
+        return;
+      }
+
       await performActivation(taskId, deps);
     },
   );
@@ -48,7 +53,7 @@ export function registerSwitchTaskCommands(
   const refreshTasks = vscode.commands.registerCommand(
     'taskkeeper.refreshTasks',
     () => {
-      refreshUi(deps);
+      refreshUi(deps, 'full');
       void vscode.window.showInformationMessage('TaskKeeper: lista atualizada.');
     },
   );
@@ -115,7 +120,7 @@ async function performActivation(
 
   let linkLoose = false;
   const hasActive = deps.store.getActiveTask() !== undefined;
-  if (!hasActive && (await deps.switcher.hasLooseContext())) {
+  if (!hasActive && (await deps.switcher.hasLooseGitChanges())) {
     const choice = await promptLinkLooseContext(target.title, 'switch');
     if (choice === undefined) {
       return;

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import type { TaskSummary } from '../models/taskContext';
 import { GENERAL_PATCH_ID } from '../services/taskStore';
+import { formatRelativeDay } from '../utils/dayTime';
 
 interface TaskPickItem extends vscode.QuickPickItem {
   taskId: string;
@@ -25,7 +26,7 @@ export async function showTaskSelection(
   items.push(
     ...tasks.map((task) => ({
       label: task.isActive ? `$(check) ${task.title}` : task.title,
-      description: formatRelativeTime(task.lastActiveAt),
+      description: formatRelativeDay(task.lastActiveAt),
       detail: `${task.breakpointCount} breakpoints · ${task.bookmarkCount} bookmarks`,
       taskId: task.id,
       picked: task.isActive,
@@ -48,25 +49,4 @@ export async function showTaskSelection(
   });
 
   return selected?.taskId;
-}
-
-function formatRelativeTime(timestamp: number): string {
-  const diffMs = Date.now() - timestamp;
-  const diffMinutes = Math.floor(diffMs / 60_000);
-
-  if (diffMinutes < 1) {
-    return 'agora';
-  }
-
-  if (diffMinutes < 60) {
-    return `há ${diffMinutes} min`;
-  }
-
-  const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) {
-    return `há ${diffHours} h`;
-  }
-
-  const diffDays = Math.floor(diffHours / 24);
-  return `há ${diffDays} d`;
 }

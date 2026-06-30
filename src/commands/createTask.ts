@@ -32,7 +32,7 @@ export function registerCreateTaskCommand(
 
         const shelvedStat = await shelvedScopeStat(deps, activeTask.id);
         const task = await deps.store.createTask(title);
-        refreshUi(deps);
+        refreshUi(deps, 'full');
         void vscode.window.showInformationMessage(
           scopeSavedMessage(activeTask.title, shelvedStat),
         );
@@ -43,7 +43,7 @@ export function registerCreateTaskCommand(
       }
 
       let linkLoose = false;
-      if (await deps.switcher.hasLooseContext()) {
+      if (await deps.switcher.hasLooseGitChanges()) {
         const choice = await promptLinkLooseContext(title, 'create');
         if (choice === undefined) {
           return;
@@ -63,7 +63,7 @@ export function registerCreateTaskCommand(
         await deps.switcher.captureContext(task);
       }
 
-      refreshUi(deps);
+      refreshUi(deps, 'full');
 
       if (!linkLoose) {
         void vscode.window.showInformationMessage(
