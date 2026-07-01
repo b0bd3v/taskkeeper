@@ -5,6 +5,10 @@
   "version": "0.0.4",
   "publisher": "utils",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/b0bd3v/taskkeeper.git"
+  },
   "engines": {
     "vscode": "^1.85.0",
     "node": ">=20"
@@ -193,7 +197,8 @@
     "test": "tsc -p tsconfig.test.json && node --require ./out-test/tests/helpers/installVscodeMock.js --test out-test/tests/",
     "test:coverage": "tsc -p tsconfig.test.json && c8 --reporter=text --reporter=lcov --include='out-test/src/**/*.js' --exclude='out-test/tests/**' node --require ./out-test/tests/helpers/installVscodeMock.js --test out-test/tests/",
     "test:watch": "tsc -p tsconfig.test.json -w",
-    "package": "vsce package --no-dependencies"
+    "package": "vsce package --no-dependencies --githubBranch main",
+    "vsix": "bash scripts/build-vsix.sh"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

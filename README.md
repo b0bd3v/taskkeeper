@@ -4,6 +4,14 @@ Extensão Cursor/VS Code para alternar entre tickets de suporte sem perder break
 
 > Especificação completa: [docs/SPECIFICATION.md](docs/SPECIFICATION.md)
 
+## Instalar no Cursor
+
+```bash
+npm run vsix
+```
+
+Gera o `.vsix` (usa Node 20 via nvm se necessário). Depois: **Cmd+Shift+P** → `Extensions: Install from VSIX...`.
+
 ## Desenvolvimento
 
 ```bash
