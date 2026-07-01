@@ -48,7 +48,7 @@ A TreeView mostra **alterações git** (modificados / incluídos / excluídos) d
 
 ## Status
 
-v0.0.3 — escopo Geral de primeira classe, lista de alterações git na sidebar, toasts ao trocar escopo.
+v0.0.4 — escopo Geral de primeira classe, lista de alterações git na sidebar, abrir arquivos de alteração direto pela sidebar e toasts ao trocar escopo.
 
 ### Comandos
 

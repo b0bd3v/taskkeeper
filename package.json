@@ -2,7 +2,7 @@
   "name": "taskkeeper",
   "displayName": "TaskKeeper",
   "description": "Task context switching for support developers — patches, breakpoints, and bookmarks per ticket.",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "publisher": "utils",
   "license": "MIT",
   "engines": {
